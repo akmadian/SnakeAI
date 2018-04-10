@@ -25,17 +25,16 @@ public class Snake : MonoBehaviour {
 		if (!isDied) {
 			// Move in a new Direction?
 			if (Input.GetKey (KeyCode.RightArrow)) {
-				dir = Vector2.right;
-				angle = 90;
+				genNewDir("right");
+				angle += 90;
 			} else if (Input.GetKey (KeyCode.DownArrow)) {
-				dir = -Vector2.up;    // '-up' means 'down'
+				genNewDir("down");    // '-up' means 'down'
 				angle = 180;
 			} else if (Input.GetKey (KeyCode.LeftArrow)) {
-				dir = -Vector2.right; // '-right' means 'left'
-				angle = 270;
+				genNewDir("left"); // '-right' means 'left'
+				angle -= 90;
 			} else if (Input.GetKey (KeyCode.UpArrow)) {
-				dir = Vector2.up;
-				angle = 0;
+				genNewDir("up");
 			} else {
 				if (Input.GetKey (KeyCode.R)) {
 					//clear the tail
@@ -52,6 +51,33 @@ public class Snake : MonoBehaviour {
 		}
 	}
 
+	public void genNewDir(string dirtogo){
+		if (dir == Vector2.right){
+			if (dirtogo == "up"){
+				dir = Vector2.up;
+			} else if (dirtogo == "down"){
+				dir = Vector2.down;}
+
+		} else if (dir == Vector2.left){
+			if (dirtogo == "up"){
+				dir = Vector2.up;
+			} else if (dirtogo == "down"){
+				dir = Vector2.down;}
+
+		} else if (dir == Vector2.up){
+			if (dirtogo == "left"){
+				dir = Vector2.left;
+			} else if (dirtogo == "right"){
+				dir = Vector2.right;}
+
+		} else if (dir == Vector2.down){
+			if (dirtogo == "left"){
+				dir = Vector2.left;
+			} else if (dirtogo == "right"){
+				dir = Vector2.right;}
+		}
+	}
+
 	public Vector2 Vector2FromAngle(float a){
 		a *= Mathf.Deg2Rad;
 		return new Vector2 (Mathf.Cos (a), Mathf.Sin (a));
@@ -60,8 +86,8 @@ public class Snake : MonoBehaviour {
 	void genRaycasts(){
 		int LayerMask = 1 << 9; // Only cast against wall layer
 		RaycastHit2D wallForward = Physics2D.Raycast (transform.position, dir, Mathf.Infinity, LayerMask);
-		RaycastHit2D wallRight = Physics2D.Raycast (transform.position, Vector2FromAngle(angle + 90), Mathf.Infinity, LayerMask);
-		RaycastHit2D wallLeft = Physics2D.Raycast (transform.position, Vector2FromAngle(angle + -90), Mathf.Infinity, LayerMask);
+		RaycastHit2D wallRight = Physics2D.Raycast (transform.position, dir.Rotate(-90f), Mathf.Infinity, LayerMask);
+		RaycastHit2D wallLeft = Physics2D.Raycast (transform.position, dir.Rotate(90f), Mathf.Infinity, LayerMask);
 
 		ForwardText.text = "wallForward:" + wallForward.distance.ToString ();
 		LeftText.text = "wallLeft   :" + wallLeft.distance.ToString ();
@@ -114,3 +140,14 @@ public class Snake : MonoBehaviour {
 	}
 }
  
+public static class Vector2Extension {
+     
+    public static Vector2 Rotate(this Vector2 v, float degrees) {
+        float sin = Mathf.Sin(degrees * Mathf.Deg2Rad);
+        float cos = Mathf.Cos(degrees * Mathf.Deg2Rad);
+         
+        float tx = v.x;
+        float ty = v.y;
+        return new Vector2(cos * tx - sin * ty, sin * tx + cos * ty);
+    }
+}

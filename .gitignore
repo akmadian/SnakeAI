@@ -3,10 +3,13 @@ Library/
 Temp/
 obj/
 Assets/ML-Agents/Examples
+SnakeAI_Data/
+.idea/
 
 # VS/ MonoDevelop#
 ExportedObj/
 *.svd
+*.log
 *.userprefs
 *.csproj
 *.pidb
@@ -17,3 +20,6 @@ ExportedObj/
 *.booproj
 *.sublime-workspace
 *.sublime-project
+WinPixEventRuntime.dll
+SnakeAI.exe
+UnityPlayer.dll
