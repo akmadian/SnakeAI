@@ -1,0 +1,19 @@
+# Unity Generated #
+Library/
+Temp/
+obj/
+Assets/ML-Agents/Examples
+
+# VS/ MonoDevelop#
+ExportedObj/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+*.sublime-workspace
+*.sublime-project
