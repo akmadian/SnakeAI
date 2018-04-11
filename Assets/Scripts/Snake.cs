@@ -78,10 +78,6 @@ public class Snake : MonoBehaviour {
 		}
 	}
 
-	public Vector2 Vector2FromAngle(float a){
-		a *= Mathf.Deg2Rad;
-		return new Vector2 (Mathf.Cos (a), Mathf.Sin (a));
-	}
 
 	void genRaycasts(){
 		int LayerMask = 1 << 9; // Only cast against wall layer

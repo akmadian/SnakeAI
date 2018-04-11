@@ -1,7 +1,7 @@
-import unityagents
 from unityagents import UnityEnvironment
-import matplotlib as plt
-import numpy as np
+from unityagents import BrainInfo
+from unityagents import AllBrainInfo
+print('Imported')
 
 
 
@@ -12,6 +12,8 @@ default_brain = env.brain_names[0]
 brain = env.brains[default_brain]
 
 print(str(env))
+print('__________')
+print(str(BrainInfo))
 env.reset(train_mode=train_mode, config=None)
 
 env.close()

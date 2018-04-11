@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SnakeAIAgent : Agent {
-	// Action 0 = turn left
-	// Action 1 = turn right
-	// Action 2 = go striaght
+	// Action 0 = left
+	// Action 1 = right
+	// Action 2 = up
+	// Action 3 = down
 	public GameObject head;
 	public GameObject tailPrefab;
 	public float moveSpeed = 0.2f;
@@ -15,47 +16,39 @@ public class SnakeAIAgent : Agent {
 	Vector3 snakeResetPos = new Vector3(0, 0, 0);
 	Vector2 dir = Vector2.right;
 	int faceAngle = 90;
+	bool ate = false;
 
 	// Layermask to exclude all but walls
-	int layerMask = 1 << 9;
+	int layerMask_onlyWalls = 1 << 9;
 
-
+	/*
 	void Start () {
 		InvokeRepeating("Move", moveSpeed, moveSpeed); 
 	}
+	*/
 
-	public Vector2 Vector2FromAngle(float a){
-		a *= Mathf.Deg2Rad;
-		return new Vector2 (Mathf.Cos (a), Mathf.Sin (a));
+	public override void InitializeAgent(){
+		base.InitializeAgent();
 	}
 
-	public void Update(){
-		//Debug.Log (Physics2D.Raycast (transform.position, Vector2FromAngle (faceAngle), Mathf.Infinity, layerMask).distance);
-	}
 
 	public override void CollectObservations(){
 		// Distance to walls from head
-		AddVectorObs (Physics2D.Raycast (transform.position, Vector2FromAngle (faceAngle + 90), Mathf.Infinity, layerMask).distance); // Right
-		AddVectorObs (Physics2D.Raycast (transform.position, Vector2FromAngle (faceAngle - 90), Mathf.Infinity, layerMask).distance); // Left
-		AddVectorObs (Physics2D.Raycast (transform.position, Vector2FromAngle (faceAngle), Mathf.Infinity, layerMask).distance); // Forward
-		AddVectorObs (Physics2D.Raycast (transform.position, Vector2FromAngle (faceAngle + 45), Mathf.Infinity, layerMask).distance); // Forward Right
-		AddVectorObs (Physics2D.Raycast (transform.position, Vector2FromAngle (faceAngle - 45), Mathf.Infinity, layerMask).distance); // Forward Left
+		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, 90f), Mathf.Infinity, layerMask_onlyWalls).distance); // Right
+		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, -90f), Mathf.Infinity, layerMask_onlyWalls).distance); // Left
+		AddVectorObs (Physics2D.Raycast (transform.position, dir, Mathf.Infinity, layerMask_onlyWalls).distance); // Forward
+		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, 45f), Mathf.Infinity, layerMask_onlyWalls).distance); // Forward Right
+		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, -45f), Mathf.Infinity, layerMask_onlyWalls).distance); // Forward Left
 	}
 
-	public override void AgentStep(){
-		if (Input.GetKey (KeyCode.RightArrow)) {
-				genNewDir("right");
-				faceAngle += 90;
-			} else if (Input.GetKey (KeyCode.DownArrow)) {
-				genNewDir("down");    // '-up' means 'down'
-				faceAngle = 180;
-			} else if (Input.GetKey (KeyCode.LeftArrow)) {
-				genNewDir("left"); // '-right' means 'left'
-				faceAngle -= 90;
-			} else if (Input.GetKey (KeyCode.UpArrow)) {
-				genNewDir("up");
-				faceAngle = 0;
-		}
+	public override void AgentAction(float[] vectorAction, string textAction){
+		Debug.Log(vectorAction);
+		int action = Mathf.FloorToInt(vectorAction[0]);
+		Debug.Log(action);
+		if (action == 1) {GenNewDir("right");} 
+		if (action == 3) {GenNewDir("down");}
+		if (action == 0) {GenNewDir("left");} 
+		if (action == 2) {GenNewDir("up");}
 	}
 
 
@@ -64,30 +57,77 @@ public class SnakeAIAgent : Agent {
 		head.transform.position = snakeResetPos;
 	}
 
-	public void genNewDir(string dirtogo){
+	public static Vector2 RotateDeg(Vector2 baseVector, float degrees) {
+        float sin = Mathf.Sin(degrees * Mathf.Deg2Rad);
+        float cos = Mathf.Cos(degrees * Mathf.Deg2Rad);
+         
+        float tx = baseVector.x;
+        float ty = baseVector.y;
+        return new Vector2(cos * tx - sin * ty, sin * tx + cos * ty);
+    }
+    /*
+    void Move() {
+		// Save current position (gap will be here)
+		Vector2 v = transform.position;
+
+		// Move head into new direction (now there is a gap)
+		transform.Translate (dir);
+
+		// Ate something? Then insert new Element into gap
+		if (ate) {
+			// Load Prefab into the world
+			GameObject g = (GameObject)Instantiate (tailPrefab,
+					        v,
+					        Quaternion.identity);
+
+			// Keep track of it in our tail list
+			tail.Insert (0, g.transform);
+
+			// Reset the flag
+			ate = false;
+		} else if (tail.Count > 0) {	// Do we have a Tail?
+				// Move last Tail Element to where the Head was
+				tail.Last ().position = v;
+
+				// Add to front of list, remove from the back
+				tail.Insert (0, tail.Last ());
+				tail.RemoveAt (tail.Count - 1);
+		}
+	}
+	*/
+
+	public void GenNewDir(string dirtogo){
 		if (dir == Vector2.right){
 			if (dirtogo == "up"){
 				dir = Vector2.up;
+				faceAngle = 0;
 			} else if (dirtogo == "down"){
-				dir = Vector2.down;}
+				dir = Vector2.down;
+				faceAngle = 180;}
 
 		} else if (dir == Vector2.left){
 			if (dirtogo == "up"){
 				dir = Vector2.up;
+				faceAngle = 0;
 			} else if (dirtogo == "down"){
-				dir = Vector2.down;}
+				dir = Vector2.down;
+				faceAngle = 180;}
 
 		} else if (dir == Vector2.up){
 			if (dirtogo == "left"){
 				dir = Vector2.left;
+				faceAngle = 270;
 			} else if (dirtogo == "right"){
-				dir = Vector2.right;}
+				dir = Vector2.right;
+				faceAngle = 90;}
 
 		} else if (dir == Vector2.down){
 			if (dirtogo == "left"){
 				dir = Vector2.left;
+				faceAngle = 270;
 			} else if (dirtogo == "right"){
-				dir = Vector2.right;}
+				dir = Vector2.right;
+				faceAngle = 90;}
 		}
 	}
 }
