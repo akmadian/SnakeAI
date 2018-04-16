@@ -10,6 +10,9 @@ train_mode = True
 env = UnityEnvironment(file_name=env_name)
 default_brain = env.brain_names[0]
 brain = env.brains[default_brain]
+env.reset()
+env.step(1)
+
 
 print(str(env))
 print('__________')
