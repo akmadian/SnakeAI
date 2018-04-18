@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,6 @@ public class SnakeAIAgent : Agent {
 	public GameObject tailPrefab;
 	public float moveSpeed = 0.2f;
 
-
 	List<Transform> tail = new List<Transform>();
 	Vector3 snakeResetPos = new Vector3(0, 0, 0);
 	Vector2 dir = Vector2.right;
@@ -20,6 +20,8 @@ public class SnakeAIAgent : Agent {
 
 	// Layermask to exclude all but walls
 	int layerMask_onlyWalls = 1 << 9;
+	string logFilePath = @"C:\Users\Ai\Desktop\SnakeAI\log.txt";
+
 
 	/*
 	void Start () {
@@ -29,22 +31,25 @@ public class SnakeAIAgent : Agent {
 
 	public override void InitializeAgent(){
 		base.InitializeAgent();
+		InitializeLogFile();
 	}
-
 
 	public override void CollectObservations(){
 		// Distance to walls from head
+		Output("__________");
 		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, 90f), Mathf.Infinity, layerMask_onlyWalls).distance); // Right
 		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, -90f), Mathf.Infinity, layerMask_onlyWalls).distance); // Left
 		AddVectorObs (Physics2D.Raycast (transform.position, dir, Mathf.Infinity, layerMask_onlyWalls).distance); // Forward
 		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, 45f), Mathf.Infinity, layerMask_onlyWalls).distance); // Forward Right
 		AddVectorObs (Physics2D.Raycast (transform.position, RotateDeg(dir, -45f), Mathf.Infinity, layerMask_onlyWalls).distance); // Forward Left
+		Output("Raycasts found and added");		
 	}
 
 	public override void AgentAction(float[] vectorAction, string textAction){
-		Debug.Log(vectorAction);
+		Output("vectorAction - " + vectorAction.ToString());
 		int action = Mathf.FloorToInt(vectorAction[0]);
-		Debug.Log(action);
+		Output("Action - " + action.ToString());
+		Output("textAction - " + textAction);
 		if (action == 1) {GenNewDir("right");} 
 		if (action == 3) {GenNewDir("down");}
 		if (action == 0) {GenNewDir("left");} 
@@ -55,6 +60,16 @@ public class SnakeAIAgent : Agent {
 	public override void AgentReset(){
 		tail.Clear ();
 		head.transform.position = snakeResetPos;
+	}
+
+	void InitializeLogFile(){
+		System.IO.File.WriteAllText(@"C:\Users\Ari\Desktop\SnakeAI\log.txt", DateTime.Now.ToString());
+	}
+
+	void Output(string message){
+		using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\Ari\Desktop\SnakeAI\log.txt", true)){
+            file.WriteLine("DEBUG LOG - " + message);
+        }
 	}
 
 	public static Vector2 RotateDeg(Vector2 baseVector, float degrees) {

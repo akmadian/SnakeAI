@@ -20,7 +20,11 @@ ExportedObj/
 *.booproj
 *.sublime-workspace
 *.sublime-project
+
 WinPixEventRuntime.dll
 SnakeAI.exe
 UnityPlayer.dll
 Links to Remember.txt
+log.txt
+brain_info.txt
+log.txt.txt
