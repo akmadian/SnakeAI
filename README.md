@@ -1,9 +1,5 @@
 # SnakeAI - A tensorflow neural network that plays snake.
 
-To run this project yourself, you must first build the game executable; name it SnakeAI.
-
-
-_______
 \-
 This project uses [Unity's ML-Agents tools](https://github.com/Unity-Technologies/ml-agents)
 
